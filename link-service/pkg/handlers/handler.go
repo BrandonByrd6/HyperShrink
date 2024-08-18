@@ -1,15 +1,11 @@
 package handlers
 
-import (
-	"github.com/brandonbyrd6/link-service/pkg/utils"
-	"gorm.io/gorm"
-)
+import "github.com/brandonbyrd6/link-service/pkg/repo"
 
 type Handler struct {
-	DB        *gorm.DB //TODO: Remove with Repositories, needs Services?
-	shortener *utils.Shortener
+	r repo.Repository
 }
 
-func NewHandler(db *gorm.DB, shortener *utils.Shortener) *Handler {
-	return &Handler{DB: db, shortener: shortener}
+func NewHandler(r repo.Repository) *Handler {
+	return &Handler{r}
 }

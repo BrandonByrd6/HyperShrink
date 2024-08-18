@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/brandonbyrd6/link-service/pkg/config"
-	"github.com/brandonbyrd6/link-service/pkg/db"
 	"github.com/brandonbyrd6/link-service/pkg/handlers"
 	"github.com/brandonbyrd6/link-service/pkg/middleware"
+	"github.com/brandonbyrd6/link-service/pkg/repo"
 	"github.com/brandonbyrd6/link-service/pkg/utils"
 	"github.com/gin-gonic/gin"
 
@@ -27,14 +27,16 @@ func init() {
 func main() {
 	cfg := config.GetConfig()
 
-	DB := db.Init()
+	//DB := db.Init()
 	//TODO: Repositories ? Not sure yet
 	//? Services, Serperation of Concerns Business logic v. Data v. Handling
-	c := utils.NewCounter(1, 100000, 100000)
-	c.Reset()
+	c := utils.NewCounter(0, 100000, 100000)
+	//c.Reset()
 	s := utils.NewShortener(c)
 
-	h := handlers.NewHandler(DB, s)
+	r := repo.NewMemoryRepository(s)
+
+	h := handlers.NewHandler(r)
 
 	router := gin.New()
 	router.Use(middleware.Logging(), gin.Recovery())

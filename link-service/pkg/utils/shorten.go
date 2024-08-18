@@ -7,15 +7,15 @@ import (
 )
 
 type Shortener struct {
-	counter *Counter
+	Counter *Counter
 }
 
 func NewShortener(c *Counter) *Shortener {
-	return &Shortener{counter: c}
+	return &Shortener{Counter: c}
 }
 
 func (s *Shortener) Generate() string {
-	i := s.counter.Increment()
+	i := s.Counter.Increment()
 	b := make([]byte, 8)
 	binary.LittleEndian.PutUint64(b, i)
 	str := base58.Encode(b)

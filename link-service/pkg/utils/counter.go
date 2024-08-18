@@ -22,6 +22,10 @@ func (c *Counter) Increment() uint64 {
 
 }
 
+func (c *Counter) GetCurrent() uint64 {
+	return c.current
+}
+
 func (c *Counter) Reset() {
 	c.min = c.max + 1
 	c.max += c.increment

@@ -3,9 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/brandonbyrd6/link-service/pkg/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -38,21 +36,9 @@ func (h *Handler) CreateUrl(c *gin.Context) {
 		fmt.Println(err)
 	}
 
-	if create.ShortUrl == "" {
-		create.ShortUrl = h.shortener.Generate()
-	}
-
-	//* Create a new url Struct
-	url := models.Url{
-		LongUrl:   create.LongUrl,
-		ShortUrl:  create.ShortUrl,
-		UserId:    create.UserID,
-		ExpiresAt: time.Now().Add(time.Duration(time.Duration.Hours(60))),
-	}
-
-	if res := h.DB.Create(&url); res.Error != nil {
-		fmt.Println(res.Error)
-		c.AbortWithError(http.StatusBadRequest, res.Error)
+	url, err := h.r.CreateUrl(create.LongUrl, create.UserID)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	//* 5. Send Data
@@ -61,25 +47,23 @@ func (h *Handler) CreateUrl(c *gin.Context) {
 
 func (h *Handler) GetUrl(c *gin.Context) {
 	short_url := c.Param("short_url")
-	url := models.Url{}
 
-	res := h.DB.Where("short_url = ?", short_url).First(&url)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		c.AbortWithError(http.StatusBadGateway, res.Error)
+	url, err := h.r.GetByShortUrl(short_url)
+	if err != nil {
+		fmt.Println(err)
 	}
+
 	c.Redirect(http.StatusTemporaryRedirect, url.LongUrl)
 }
 
 func (h *Handler) DeleteUrl(c *gin.Context) {
 	short_url := c.Param("short_url")
-	url := models.Url{}
 
-	res := h.DB.Where("short_url = ?", short_url).Delete(&url)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		c.AbortWithError(http.StatusBadGateway, res.Error)
+	err := h.r.DeleteUrlByShortURL(short_url)
+	if err != nil {
+		fmt.Println(err)
 	}
+
 	c.JSON(http.StatusAccepted, gin.H{
 		"Delete": "Accepted",
 	})
