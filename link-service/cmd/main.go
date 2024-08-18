@@ -6,9 +6,23 @@ import (
 	"github.com/brandonbyrd6/link-service/pkg/config"
 	"github.com/brandonbyrd6/link-service/pkg/db"
 	"github.com/brandonbyrd6/link-service/pkg/handlers"
+	"github.com/brandonbyrd6/link-service/pkg/middleware"
 	"github.com/brandonbyrd6/link-service/pkg/utils"
 	"github.com/gin-gonic/gin"
+
+	log "github.com/sirupsen/logrus"
 )
+
+func init() {
+	// logLevel, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	// if err != nil {
+	// 	logLevel = log.InfoLevel
+	// }
+
+	logLevel := log.InfoLevel
+	log.SetLevel(logLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+}
 
 func main() {
 	cfg := config.GetConfig()
@@ -22,8 +36,8 @@ func main() {
 
 	h := handlers.NewHandler(DB, s)
 
-	router := gin.Default()
-	router.Use(gin.Logger(), gin.Recovery())
+	router := gin.New()
+	router.Use(middleware.Logging(), gin.Recovery())
 
 	v1 := router.Group("/api/v1")
 
