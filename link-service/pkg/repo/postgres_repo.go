@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"errors"
 	"time"
 
 	"github.com/brandonbyrd6/link-service/pkg/models"
@@ -23,40 +22,35 @@ func NewPostgresRepository(db *gorm.DB, s *utils.Shortener) PostgresRepository {
 
 func (p PostgresRepository) GetByShortUrl(ShortURL string) (*models.Url, error) {
 	url := models.Url{}
-
-	if !ok {
-		return nil, errors.New("No Url Found")
+	res := p.db.Where("short_url = ?", ShortURL).First(&url)
+	if res.Error != nil {
+		return nil, res.Error
 	}
-	return url, nil
+	return &url, nil
 }
 
 func (p PostgresRepository) CreateUrl(LongURL string, UserID string) (*models.Url, error) {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	surl := r.shortener.Generate()
-	Url := models.Url{
-		ID:        uint(r.shortener.Counter.GetCurrent()),
+	surl := p.shortener.Generate()
+	url := models.Url{
 		UserId:    UserID,
 		LongUrl:   LongURL,
 		ShortUrl:  surl,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 		ExpiresAt: time.Now().Add(time.Duration(time.Duration.Hours(60))),
 	}
-	r.Urls[surl] = &Url
-	return &Url, nil
+
+	if res := p.db.Create(&url); res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &url, nil
 }
 
 func (p PostgresRepository) DeleteUrlByShortURL(ShortURL string) error {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
+	url := models.Url{}
 
-	_, ok := r.Urls[ShortURL]
-	if !ok {
-		return errors.New("No Url Found")
+	res := p.db.Where("short_url = ?", ShortURL).Delete(&url)
+	if res.Error != nil {
+		return res.Error
 	}
-	delete(r.Urls, ShortURL)
-
 	return nil
 }
