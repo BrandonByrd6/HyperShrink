@@ -13,14 +13,14 @@ type PostgresRepository struct {
 	shortener *utils.Shortener
 }
 
-func NewPostgresRepository(db *gorm.DB, s *utils.Shortener) PostgresRepository {
-	return PostgresRepository{
+func NewPostgresRepository(db *gorm.DB, s *utils.Shortener) *PostgresRepository {
+	return &PostgresRepository{
 		db:        db,
 		shortener: s,
 	}
 }
 
-func (p PostgresRepository) GetByShortUrl(ShortURL string) (*models.Url, error) {
+func (p *PostgresRepository) GetByShortUrl(ShortURL string) (*models.Url, error) {
 	url := models.Url{}
 	res := p.db.Where("short_url = ?", ShortURL).First(&url)
 	if res.Error != nil {
@@ -29,7 +29,7 @@ func (p PostgresRepository) GetByShortUrl(ShortURL string) (*models.Url, error) 
 	return &url, nil
 }
 
-func (p PostgresRepository) CreateUrl(LongURL string, UserID string) (*models.Url, error) {
+func (p *PostgresRepository) CreateUrl(LongURL string, UserID string) (*models.Url, error) {
 	surl := p.shortener.Generate()
 	url := models.Url{
 		UserId:    UserID,
@@ -45,7 +45,7 @@ func (p PostgresRepository) CreateUrl(LongURL string, UserID string) (*models.Ur
 	return &url, nil
 }
 
-func (p PostgresRepository) DeleteUrlByShortURL(ShortURL string) error {
+func (p *PostgresRepository) DeleteUrlByShortURL(ShortURL string) error {
 	url := models.Url{}
 
 	res := p.db.Where("short_url = ?", ShortURL).Delete(&url)

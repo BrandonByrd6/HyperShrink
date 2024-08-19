@@ -3,12 +3,12 @@ package config
 import (
 	"errors"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Env      string
 	Server   ServerConfig
 	Postgres PostgresConfig
 }
@@ -22,8 +22,15 @@ type ServerConfig struct {
 	Port string
 }
 
-func getConfigPath() string {
+func getConfigPath(env string) string {
+	if env == "prod" {
+		return "./conf/prod"
+	}
+	if env == "testing" {
+		return "./conf/testing"
+	}
 	return "./conf/dev"
+
 }
 
 func LoadConfig(filename string, fileType string) (*viper.Viper, error) {
@@ -55,13 +62,16 @@ func ParseConfig(v *viper.Viper) (*Config, error) {
 }
 
 func GetConfig() *Config {
-	cfgPath := getConfigPath() //os.Getenv("APP_ENV"))
+	cfgPath := getConfigPath(os.Getenv("APP_ENV"))
 	v, err := LoadConfig(cfgPath, "yml")
 	if err != nil {
 		log.Fatalf("Error in load config %v", err)
 	}
 
 	cfg, err := ParseConfig(v)
+	if err != nil {
+		log.Panic(err)
+	}
 
 	return cfg
 }

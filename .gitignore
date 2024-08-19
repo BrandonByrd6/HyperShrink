@@ -27,6 +27,8 @@ _testmain.go
 *.out
 *.txt
 /**/dev.yml
+/**/prod.yml
+/**/testing.yml1
 /**/*.DS_Store
 cover.html
 README.html

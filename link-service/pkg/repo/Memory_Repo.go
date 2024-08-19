@@ -15,26 +15,26 @@ type MemoryRepository struct {
 	shortener *utils.Shortener
 }
 
-func NewMemoryRepository(s *utils.Shortener) MemoryRepository {
-	return MemoryRepository{
+func NewMemoryRepository(s *utils.Shortener) *MemoryRepository {
+	return &MemoryRepository{
 		Urls:      map[string]*models.Url{},
 		lock:      &sync.RWMutex{},
 		shortener: s,
 	}
 }
 
-func (r MemoryRepository) GetByShortUrl(ShortURL string) (*models.Url, error) {
+func (r *MemoryRepository) GetByShortUrl(ShortURL string) (*models.Url, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
 	url, ok := r.Urls[ShortURL]
 	if !ok {
-		return nil, errors.New("No Url Found")
+		return nil, errors.New("no url found")
 	}
 	return url, nil
 }
 
-func (r MemoryRepository) CreateUrl(LongURL string, UserID string) (*models.Url, error) {
+func (r *MemoryRepository) CreateUrl(LongURL string, UserID string) (*models.Url, error) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
@@ -52,13 +52,13 @@ func (r MemoryRepository) CreateUrl(LongURL string, UserID string) (*models.Url,
 	return &Url, nil
 }
 
-func (r MemoryRepository) DeleteUrlByShortURL(ShortURL string) error {
+func (r *MemoryRepository) DeleteUrlByShortURL(ShortURL string) error {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
 	_, ok := r.Urls[ShortURL]
 	if !ok {
-		return errors.New("No Url Found")
+		return errors.New("no url found")
 	}
 	delete(r.Urls, ShortURL)
 

@@ -7,10 +7,10 @@ import (
 )
 
 type Shortener struct {
-	Counter *Counter
+	Counter CounterInterface
 }
 
-func NewShortener(c *Counter) *Shortener {
+func NewShortener(c CounterInterface) *Shortener {
 	return &Shortener{Counter: c}
 }
 
