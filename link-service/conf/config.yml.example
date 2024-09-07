@@ -4,3 +4,8 @@ server:
 
 postgres:
   url:
+
+etcd:
+  endpoint:
+    -
+  dialtimeout: 

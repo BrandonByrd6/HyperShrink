@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/brandonbyrd6/link-service/pkg/application"
-	"github.com/brandonbyrd6/link-service/pkg/config"
-	"github.com/brandonbyrd6/link-service/pkg/repo"
-	"github.com/brandonbyrd6/link-service/pkg/utils"
+	"context"
+	"fmt"
+
+	"github.com/brandonbyrd6/link-service/pkg/connections"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -21,15 +21,26 @@ func init() {
 }
 
 func main() {
-	cfg := config.GetConfig()
+	//cfg := config.GetConfig()
 
-	c := utils.NewCounter(0, 100000, 100000)
-	s := utils.NewShortener(c)
-	r := repo.NewMemoryRepository(s)
+	kv := connections.Init()
+	resp, err := kv.Put(context.Background(), "Test", "Value", nil)
 
-	app := application.NewApplication(cfg, s, r)
+	if err != nil {
+		fmt.Println("main")
+		fmt.Println(err)
+	}
 
-	app.Start()
+	fmt.Println(resp.PrevKv.Value)
+	fmt.Println(resp.Header.String())
+
+	// c := utils.NewCounter(0, 100000, 100000)
+	// s := utils.NewShortener(c)
+	// r := repo.NewMemoryRepository(s)
+
+	// app := application.NewApplication(cfg, s, r)
+
+	// app.Start()
 
 	//DB := db.Init()
 

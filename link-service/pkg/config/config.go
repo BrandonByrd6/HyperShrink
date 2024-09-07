@@ -11,6 +11,12 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Postgres PostgresConfig
+	Etcd     EtcdConfig
+}
+
+type EtcdConfig struct {
+	Endpoints   []string
+	DialTimeOut int
 }
 
 type PostgresConfig struct {
